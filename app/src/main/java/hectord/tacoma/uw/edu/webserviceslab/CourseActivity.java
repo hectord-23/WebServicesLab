@@ -1,5 +1,8 @@
 package hectord.tacoma.uw.edu.webserviceslab;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -18,6 +21,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import hectord.tacoma.uw.edu.webserviceslab.authenticate.SignInActivity;
 import hectord.tacoma.uw.edu.webserviceslab.model.Course;
 
 public class CourseActivity extends AppCompatActivity implements CourseListFragment.OnListFragmentInteractionListener,
@@ -45,12 +49,30 @@ public class CourseActivity extends AppCompatActivity implements CourseListFragm
             }
         });
 
+        // Log out button
+        FloatingActionButton logoutbutton = (FloatingActionButton) findViewById(R.id.action_logout);
+        logoutbutton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                SharedPreferences sharedPreferences =
+                        getSharedPreferences(getString(R.string.LOGIN_PREFS), Context.MODE_PRIVATE);
+                sharedPreferences.edit().putBoolean(getString(R.string.LOGGEDIN), false)
+                        .commit();
+
+                Intent i = new Intent(getApplicationContext(), SignInActivity.class);
+                startActivity(i);
+                finish();
+
+            }
+        });
+
         if (savedInstanceState == null || getSupportFragmentManager().findFragmentById(R.id.list) == null) {
             CourseListFragment courseListFragment = new CourseListFragment();
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.fragment_container, courseListFragment)
                     .commit();
         }
+
     }
 
 

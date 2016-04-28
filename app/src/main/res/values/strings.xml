@@ -12,5 +12,6 @@
     <string name="signIn_butt">Sign IN</string>
     <string name="LOGIN_PREFS">edu.uw.tacoma.hectord.webservicelab.PREFS</string>
     <string name="LOGGEDIN">loggedin</string>
+    <string name="LOGIN_FILE">edu.uw.tacoma.hectord.webservicelab.LOGIN_FILE</string>
 
 </resources>

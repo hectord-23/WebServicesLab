@@ -1,6 +1,8 @@
 package hectord.tacoma.uw.edu.webserviceslab;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -8,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +18,7 @@ import android.widget.Toast;
 
 //import hectord.tacoma.uw.edu.webserviceslab.dummy.DummyContent;
 //import hectord.tacoma.uw.edu.webserviceslab.dummy.DummyContent.DummyItem;
+import hectord.tacoma.uw.edu.webserviceslab.data.CourseDB;
 import hectord.tacoma.uw.edu.webserviceslab.model.Course;
 
 import java.io.BufferedReader;
@@ -43,6 +47,8 @@ public class CourseListFragment extends Fragment {
     private int mColumnCount = 1;
 
     private OnListFragmentInteractionListener mListener;
+    private List<Course> mCourseList;
+    private CourseDB mCourseDB;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -73,13 +79,54 @@ public class CourseListFragment extends Fragment {
             }
 
         }
-
-        DownloadCoursesTask task = new DownloadCoursesTask();
-        task.execute(new String[]{COURSE_URL});
-
+        // add course action button
         FloatingActionButton floatingActionButton = (FloatingActionButton)
                 getActivity().findViewById(R.id.fab);
         floatingActionButton.show();
+
+        // check if network exist
+        ConnectivityManager connMgr = (ConnectivityManager)
+                getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        if(networkInfo != null && networkInfo.isConnected()) {
+            DownloadCoursesTask task = new DownloadCoursesTask();
+            task.execute(new String[]{COURSE_URL});
+        } else {
+            Toast.makeText(view.getContext(),
+                    "No network connection available. Displaying locally stored data",
+                    Toast.LENGTH_SHORT).show();
+            mRecyclerView.setAdapter(new MyCourseRecyclerViewAdapter(mCourseList, mListener));
+
+        }
+        if (mCourseDB == null) {
+            mCourseDB = new CourseDB(getActivity());
+        }
+        if (mCourseList == null) {
+            mCourseList = mCourseDB.getCourses();
+        }
+
+
+        //Read from file "LOGIN_FILE" and show the text
+        try {
+            InputStream inputStream = getActivity().openFileInput(
+                    getString(R.string.LOGIN_FILE));
+            if ( inputStream != null ) {
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                String receiveString = "";
+                StringBuilder stringBuilder = new StringBuilder();
+
+                while ((receiveString = bufferedReader.readLine()) != null) {
+                    stringBuilder.append(receiveString);
+                }
+
+                inputStream.close();
+                Toast.makeText(getActivity(), stringBuilder.toString(), Toast.LENGTH_LONG)
+                        .show();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
 
         return view;
@@ -171,11 +218,65 @@ public class CourseListFragment extends Fragment {
             }
 
             // Everything is good, show the list of courses.
-            if (!courseList.isEmpty()) {
+
+//            if (!courseList.isEmpty()) {
+//                mRecyclerView.setAdapter(new MyCourseRecyclerViewAdapter(courseList, mListener));
+//            }
+//            Log.i("LIST", "The size is: " + mCourseList.size());
+            ConnectivityManager connMgr = (ConnectivityManager)
+                    getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+//            if(networkInfo != null && networkInfo.isConnected()) {
+
+            if (!mCourseList.isEmpty() && !networkInfo.isConnected()) {
+                Toast.makeText(getActivity().getApplicationContext(), "No network but local list", Toast.LENGTH_SHORT)
+                        .show();
+
+
+                mRecyclerView.setAdapter(new MyCourseRecyclerViewAdapter(mCourseList, mListener));
+
+                if(mCourseDB == null) {
+                    mCourseDB = new CourseDB(getActivity());
+                }
+
+                //Delete old data so that you can refresh the local
+                // database wtihht the network data.
+                mCourseDB.deleteCourses();
+
+                // Also, add to the local database
+                for (int i=0; i<mCourseList.size(); i++) {
+                    Course course = mCourseList.get(i);
+                    mCourseDB.insertCourse(course.getCourseId(),
+                            course.getShortDescription(),
+                            course.getLongDescription(),
+                            course.getPrereqs());
+                }
+
+            } else if(courseList.isEmpty() && !networkInfo.isConnected()) { //TODO I added this
+                Toast.makeText(getActivity().getApplicationContext(), "Empty list with network", Toast.LENGTH_SHORT)
+                        .show();
+                mRecyclerView.setAdapter(new MyCourseRecyclerViewAdapter(mCourseList, mListener));
+                if(mCourseDB == null) {
+                    mCourseDB = new CourseDB(getActivity());
+                }
+
+                //Delete old data so that you can refresh the local
+                // database with the network data.
+                mCourseDB.deleteCourses();
+
+                // Also, add to the local database
+                for (int i=0; i<courseList.size(); i++) {
+                    Course course = courseList.get(i);
+                    mCourseDB.insertCourse(course.getCourseId(),
+                            course.getShortDescription(),
+                            course.getLongDescription(),
+                            course.getPrereqs());
+                }
+            } else if(!courseList.isEmpty()) {
+                Toast.makeText(getActivity().getApplicationContext(), "List not empty with network", Toast.LENGTH_SHORT)
+                        .show();
                 mRecyclerView.setAdapter(new MyCourseRecyclerViewAdapter(courseList, mListener));
             }
         }
-
-
     }
 }
