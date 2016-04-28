@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">WebServicesLab</string>
+    <string name="title_activity_course">CourseActivity</string>
+    <string name="course_id_hint">Enter Course Id (Ex: TCSS450) </string>
+    <string name="course_short_desc_hint">Enter Course Short Description (Ex: Mobile App Programming) </string>
+    <string name="course_long_desc_hint">Enter Course Long Description</string>
+    <string name="course_prereqs_hint">Enter prereqs</string>
+    <string name="add_course_text">Add Course</string>
+
+    <string name="enterId_hint">Enter your userid</string>
+    <string name="enter_password_hint">Enter your password</string>
+    <string name="signIn_butt">Sign IN</string>
+    <string name="LOGIN_PREFS">edu.uw.tacoma.hectord.webservicelab.PREFS</string>
+    <string name="LOGGEDIN">loggedin</string>
+
+</resources>

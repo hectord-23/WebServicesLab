@@ -1,0 +1,30 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="hectord.tacoma.uw.edu.webserviceslab.LoginFragment">
+
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/enterId_hint"
+        android:inputType="text"
+        android:id="@+id/user_id" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/enter_password_hint"
+        android:inputType="textPassword"
+        android:ems="10"
+        android:id="@+id/pwd" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/signIn_butt"
+        android:id="@+id/signin_button"
+        android:layout_gravity="right" />
+</LinearLayout>
