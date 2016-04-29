@@ -9,6 +9,8 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -75,7 +77,31 @@ public class CourseActivity extends AppCompatActivity implements CourseListFragm
 
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // binding the menu xml to the code
+        getMenuInflater().inflate(R.menu.menu_course_list, menu);
+        return true;
+    }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+
+        int id = item.getItemId();
+        if (id == R.id.action_logout1) {
+            SharedPreferences sharedPreferences =
+                    getSharedPreferences(getString(R.string.LOGIN_PREFS), Context.MODE_PRIVATE);
+            sharedPreferences.edit().putBoolean(getString(R.string.LOGGEDIN), false)
+                    .commit();
+
+            Intent i = new Intent(this, SignInActivity.class);
+            startActivity(i);
+            finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     @Override
     public void onListFragmentInteraction(Course item) {

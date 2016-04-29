@@ -92,17 +92,18 @@ public class CourseListFragment extends Fragment {
             DownloadCoursesTask task = new DownloadCoursesTask();
             task.execute(new String[]{COURSE_URL});
         } else {
+
+            if (mCourseDB == null) {
+                mCourseDB = new CourseDB(getActivity());
+            }
+            if (mCourseList == null) {
+                mCourseList = mCourseDB.getCourses();
+            }
             Toast.makeText(view.getContext(),
                     "No network connection available. Displaying locally stored data",
                     Toast.LENGTH_SHORT).show();
             mRecyclerView.setAdapter(new MyCourseRecyclerViewAdapter(mCourseList, mListener));
 
-        }
-        if (mCourseDB == null) {
-            mCourseDB = new CourseDB(getActivity());
-        }
-        if (mCourseList == null) {
-            mCourseList = mCourseDB.getCourses();
         }
 
 
@@ -208,8 +209,8 @@ public class CourseListFragment extends Fragment {
                 return;
             }
 
-            List<Course> courseList = new ArrayList<Course>();
-            result = Course.parseCourseJSON(result, courseList);
+            mCourseList = new ArrayList<Course>();
+            result = Course.parseCourseJSON(result, mCourseList);
             // Something wrong with the JSON returned.
             if (result != null) {
                 Toast.makeText(getActivity().getApplicationContext(), result, Toast.LENGTH_LONG)
@@ -217,30 +218,15 @@ public class CourseListFragment extends Fragment {
                 return;
             }
 
-            // Everything is good, show the list of courses.
-
-//            if (!courseList.isEmpty()) {
-//                mRecyclerView.setAdapter(new MyCourseRecyclerViewAdapter(courseList, mListener));
-//            }
-//            Log.i("LIST", "The size is: " + mCourseList.size());
-            ConnectivityManager connMgr = (ConnectivityManager)
-                    getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-            NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-//            if(networkInfo != null && networkInfo.isConnected()) {
-
-            if (!mCourseList.isEmpty() && !networkInfo.isConnected()) {
-                Toast.makeText(getActivity().getApplicationContext(), "No network but local list", Toast.LENGTH_SHORT)
-                        .show();
-
-
+            if (!mCourseList.isEmpty()) {
                 mRecyclerView.setAdapter(new MyCourseRecyclerViewAdapter(mCourseList, mListener));
 
-                if(mCourseDB == null) {
+                if (mCourseDB == null) {
                     mCourseDB = new CourseDB(getActivity());
                 }
 
-                //Delete old data so that you can refresh the local
-                // database wtihht the network data.
+                // Delete old data so that you can refresh the local
+                // database with the network data.
                 mCourseDB.deleteCourses();
 
                 // Also, add to the local database
@@ -252,30 +238,6 @@ public class CourseListFragment extends Fragment {
                             course.getPrereqs());
                 }
 
-            } else if(courseList.isEmpty() && !networkInfo.isConnected()) { //TODO I added this
-                Toast.makeText(getActivity().getApplicationContext(), "Empty list with network", Toast.LENGTH_SHORT)
-                        .show();
-                mRecyclerView.setAdapter(new MyCourseRecyclerViewAdapter(mCourseList, mListener));
-                if(mCourseDB == null) {
-                    mCourseDB = new CourseDB(getActivity());
-                }
-
-                //Delete old data so that you can refresh the local
-                // database with the network data.
-                mCourseDB.deleteCourses();
-
-                // Also, add to the local database
-                for (int i=0; i<courseList.size(); i++) {
-                    Course course = courseList.get(i);
-                    mCourseDB.insertCourse(course.getCourseId(),
-                            course.getShortDescription(),
-                            course.getLongDescription(),
-                            course.getPrereqs());
-                }
-            } else if(!courseList.isEmpty()) {
-                Toast.makeText(getActivity().getApplicationContext(), "List not empty with network", Toast.LENGTH_SHORT)
-                        .show();
-                mRecyclerView.setAdapter(new MyCourseRecyclerViewAdapter(courseList, mListener));
             }
         }
     }
