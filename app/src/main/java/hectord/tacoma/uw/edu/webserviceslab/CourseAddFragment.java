@@ -58,7 +58,7 @@ public class CourseAddFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        getActivity().setTitle(R.string.app_name);
+        getActivity().setTitle("Add a Course");
     }
 
     @Override

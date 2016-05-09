@@ -44,6 +44,4 @@ public class SignInActivityTest extends
         boolean worked = solo.searchText("Course List");
         assertTrue("Sign in worked!", worked);
     }
-
-
 }
