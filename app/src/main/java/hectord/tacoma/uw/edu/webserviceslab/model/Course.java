@@ -52,6 +52,11 @@ public class Course implements Serializable{
     }
 
     public void setCourseId(String mCourseId) {
+        if(mCourseId == null) {
+            throw new IllegalArgumentException("Can not set course Id to null!");
+        } else if(mCourseId.length() < 5) {
+            throw new IllegalArgumentException("Course Id can not be less than 5 characters!");
+        }
         this.mCourseId = mCourseId;
     }
 

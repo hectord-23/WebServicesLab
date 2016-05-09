@@ -55,6 +55,11 @@ public class CourseAddFragment extends Fragment {
         // Required empty public constructor
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        getActivity().setTitle(R.string.app_name);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

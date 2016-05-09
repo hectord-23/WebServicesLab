@@ -127,6 +127,12 @@ public class CourseActivity extends AppCompatActivity implements CourseListFragm
         getSupportFragmentManager().popBackStackImmediate();
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        setTitle(R.string.addCourse_title);
+    }
+
 
     /** AsyncTask class called CourseAddAsyncTask that will allow us to call the service for adding a course. */
     private class AddCourseTask extends AsyncTask<String, Void, String> {
